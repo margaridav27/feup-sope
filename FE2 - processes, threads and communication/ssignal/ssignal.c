@@ -5,6 +5,12 @@
 #include <unistd.h>
 #include <signal.h>
 
+/*
+The behavior of signal() varies across UNIX versions, 
+and has also varied historically across different 
+versions of Linux. Therefore, one should avoid its use.
+*/
+
 void func(int signo) {
 	fprintf(stderr, "\nReceived signal %d!\n", signo);
 	}
