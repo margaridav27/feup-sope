@@ -1,6 +1,7 @@
 # feup-sope
 
 FE* - exercises solved during pratical classes
+
 SUP* - supplementary exercises
 
 ## Disclaimer
