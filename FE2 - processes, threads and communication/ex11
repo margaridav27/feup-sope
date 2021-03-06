@@ -1,0 +1,3 @@
+- pipes são canais anónimos, não identificados no sistema de ficheiros, que permitem a comunicação apenas entre processos com algum grau de parentesco - o canal é criado pelo processo ancestral, imediatamente antes da chamada fork, e apenas os processos que herdam desse (que não necessariamente os processos filhos, podem ser os processos netos, etc) é que conseguem aceder a esse canal
+
+- FIFOS são ficheiros especiais com nome, ou seja, identificados no sistema de ficheiros, que permitem a comunicação entre processos, mesmo que estes não estejam relacionados, inclusivé entre processos que dizem respeitos a utilizadores diferentes
