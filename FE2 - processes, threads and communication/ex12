@@ -1,7 +1,23 @@
-O propósito poderia ser alcançado quer usando (normal pipes) - ii, quer usando named pipes - i. 
+O propósito poderia ser alcançado quer usando (normal pipes) - ii,
+quer usando named pipes - i. 
 
-A estratégia para ambas seria muito semelhante - o processo responsável por enviar a cor escreveria a identificação correspondente à mesma, informação que seria lida pelo outro processo. Depois de receber a respetiva cor, este último só teria que transmitir a informação de se já a tinha ou não disponível na paleta.
+A estratégia para ambas seria muito semelhante - o processo responsável
+por enviar a cor escreveria a identificação correspondente à mesma,
+informação que seria lida pelo outro processo. Depois de receber a 
+respetiva cor, este último só teria que transmitir a informação de
+se já a tinha ou não disponível na paleta.
 
-Há, no entanto, que salientar que, devido à estrutura unidirecional das normal pipes, para se cumprir com o descrito acima, teria que se abrir duas pipes, uma para escrever/ler a cor e outra para escrever/ler o feedback relativamente à cor recebida.
+Há, no entanto, que salientar que, devido à estrutura unidirecional
+das normal pipes, para se cumprir com o descrito acima, teria que se
+abrir duas pipes, uma para escrever/ler a cor e outra para escrever/ler
+o feedback relativamente à cor recebida.
 
-O objetivo não seria alcançado usando sinais uma vez que não é possível enviar informação entre processos usando esse mecanismo. Suponhamos, no entanto, que um processo sabia, em função do sinal recebido por um outro processo, qual a cor correspondente a esse sinal. Ainda assim, não haveria garantias que a informação seria transmitida com sucesso dado que, mesmo que o emissor enviasse o sinal, se o recetor não o recebesse, por exemplo por, naquele momento, estar ocupado a lidar com um outro sinal, nenhum aviso seria gerado e o sinal seria simplesmente descartado. Por este motivo conlcui-se que, de facto, seria impossível alcançar o proposto recorrendo a sinais.
+O objetivo não seria alcançado usando sinais uma vez que não é possível
+enviar informação entre processos usando esse mecanismo. Suponhamos, no
+entanto, que um processo sabia, em função do sinal recebido por um outro
+processo, qual a cor correspondente a esse sinal. Ainda assim, não haveria
+garantias que a informação seria transmitida com sucesso dado que, mesmo
+que o emissor enviasse o sinal, se o recetor não o recebesse, por exemplo
+por, naquele momento, estar ocupado a lidar com um outro sinal, nenhum aviso
+seria gerado e o sinal seria simplesmente descartado. Por este motivo
+conlcui-se que, de facto, seria impossível alcançar o proposto recorrendo a sinais.
