@@ -8,9 +8,20 @@ int main(int argc, char* argv[], char* env[]) {
     }
 
     printf("Environment variables\n");
-    char *tok;
-    const char delim[2] = "=";
 
+    for (int i = 1; i < argc; i++) {
+        int j = 0;
+        while (env[j] != NULL) {
+            if (strcmp(strtok(env[j], "="), argv[i]) == 0) {
+                printf("%s", strtok(env[j], "\0")); // since every string ends with the null char
+                printf("\n");
+                break;
+            }
+            j++;
+        }
+    }
+
+    /*
     for (int i = 1; i < argc; i++) {
         int j = 0;
         while (env[j] != NULL) {
@@ -29,4 +40,5 @@ int main(int argc, char* argv[], char* env[]) {
             j++;
         }
     } 
+    */
 }
