@@ -24,7 +24,7 @@ int main() {
 	new_sigint.sa_handler = sig_handler; 
 	new_sigint.sa_mask = smask; 
 	new_sigint.sa_flags = 0; 
-	if(sigaction(SIGUSR1, &new_sigint, NULL) == -1) perror ("sigaction");
+	if(sigaction(SIGINT, &new_sigint, NULL) == -1) perror ("sigaction");
 
     //signal handler configuration for SIGUSR1
 	new_sigusr1.sa_handler = sig_handler; 
