@@ -2,18 +2,57 @@
 #include <stdlib.h>
 #include <pthread.h>
 
-#define MAXCOUNT 10
+#define BUF_SIZE 20
+#define MAX_ITER 100000
 long count;
-void *thr_fun(void *);
+long iter;
 
-pthread_mutex_t mutex;
+pthread_mutex_t mutex_consumer;
+pthread_mutex_t mutex_producer;
+
+void *produce(void *arg) {
+	while (iter < MAX_ITER) {
+		pthread_mutex_lock(&mutex_producer);
+
+		if (count < BUF_SIZE) {
+			printf("\n%ld", count);
+			count++;
+		}
+
+		pthread_mutex_unlock(&mutex_producer);
+	}
+
+	printf("\nEND of thread %lu!\n", (unsigned long)pthread_self());
+	
+	return (NULL);
+}
+
+void *consume(void *arg) {
+	while (iter < MAX_ITER) {
+		pthread_mutex_lock(&mutex_consumer);
+
+		if (count < BUF_SIZE) {
+			printf("\n%ld", count);
+			count--;
+		}
+
+		pthread_mutex_unlock(&mutex_consumer);
+	}
+
+	printf("\nEND of thread %lu!\n", (unsigned long)pthread_self());
+	
+	return (NULL);
+}
 
 int main(int argc, char *argv[]) {
-    pthread_mutex_init(&mutex, NULL);
+    pthread_mutex_init(&mutex_producer, NULL);
+	pthread_mutex_init(&mutex_consumer, NULL);
 
 	pthread_t *ptid;
 	int nthreads;
 	int i;
+
+	int thtype = 0; // producer - 0 / consumer - 1
 
 	setbuf(stdout, NULL);
 	if (argc < 2) {
@@ -27,35 +66,31 @@ int main(int argc, char *argv[]) {
 		perror("malloc");
 		exit(2);
 	}
+
 	for (i = 0; i < nthreads; i++) {
-		if (pthread_create(&ptid[i], NULL, thr_fun, NULL) != 0) {
-			perror("pthread_create");
-			exit(3);
+
+		if (thtype == 0) { // create producer thread
+			if (pthread_create(&ptid[i], NULL, produce, NULL) != 0) {
+				perror("pthread_create");
+				exit(3);
+			}
+		} else { // create consumer thread
+			if (pthread_create(&ptid[i], NULL, consume, NULL) != 0) {
+				perror("pthread_create");
+				exit(3);
+			}
 		}
+
+		thtype = (thtype + 1) % 2; // alternating between types
 	}
 
-	for (i = 0; i < nthreads; i++)
-		pthread_join(ptid[i], NULL);
+	for (i = 0; i < nthreads; i++) pthread_join(ptid[i], NULL);
 
 	printf("\nEND!\n");
 
-	pthread_mutex_destroy(&mutex);
+	pthread_mutex_destroy(&mutex_producer);
+	pthread_mutex_destroy(&mutex_consumer);
 	return 0;
 }
 
-void *thr_fun(void *arg) {
-	while (count < MAXCOUNT) {
-		pthread_mutex_lock(&mutex);
 
-		if (count < MAXCOUNT) {
-			printf("\n%ld  ->  printed by thread %lu\n", count, (unsigned long)pthread_self());
-			count++;
-		}
-
-		pthread_mutex_unlock(&mutex);
-	}
-
-	printf("\nEND thread %lu!\n", (unsigned long)pthread_self());
-	
-	return (NULL);
-}
