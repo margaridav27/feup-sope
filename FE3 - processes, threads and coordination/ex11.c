@@ -2,45 +2,57 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <semaphore.h>
+#include <unistd.h>
 
 #define BUF_SIZE 20
-#define MAX_ITER 100000
+#define MAX_ITER 100
 long count;
 long iter;
 
-sem_t semaphore;
+sem_t empty;
+sem_t full;
+pthread_mutex_t mutex;
 
 void *produce(void *arg) {
-	while (count == BUF_SIZE) ;
+	while (iter < MAX_ITER && count < BUF_SIZE) {
+		sem_wait(&empty);
+		pthread_mutex_lock(&mutex);
 
-	sem_wait(&semaphore);
+		iter++;
+		count++;
 
-	iter++;
-	count++;
-	printf("\n%ld\t%ld", count, iter);
+		printf("\n%ld\t%ld", count, iter);
 
-	sem_post(&semaphore); 
+		pthread_mutex_unlock(&mutex);
+		sem_post(&full);
+
+	}
 
 	return (NULL);
 }
 
 void *consume(void *arg) {
-	while (count == 0) ;
+	while (iter < MAX_ITER && count < BUF_SIZE) {
+		sem_wait(&full);
+		pthread_mutex_lock(&mutex);
 
-	sem_wait(&semaphore);
+		iter++;
+		count--;
 
-	iter++;
-	count--;
-	printf("\n%ld\t%ld", count, iter);
+		printf("\n%ld\t%ld", count, iter);
 
-	sem_post(&semaphore); 
+		pthread_mutex_unlock(&mutex);
+		sem_post(&empty);
+	}
 
 	return (NULL);
 }
 
 int main(int argc, char *argv[]) {
-    sem_init(&semaphore, 0, 1);
-
+	pthread_mutex_init(&mutex, NULL);
+    sem_init(&empty, 0, BUF_SIZE);
+	sem_init(&full, 0, 0);
+	
 	pthread_t *ptid;
 	int nthreads;
 	int i;
@@ -75,7 +87,9 @@ int main(int argc, char *argv[]) {
 
 	for (i = 0; i < nthreads; i++) pthread_join(ptid[i], NULL);
 
-	sem_destroy(&semaphore);
+	pthread_mutex_destroy(&mutex);
+	sem_destroy(&empty);
+	sem_destroy(&full);
 	return 0;
 }
 
