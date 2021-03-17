@@ -1,58 +1,49 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include <semaphore.h>
 
 #define BUF_SIZE 20
 #define MAX_ITER 100000
 long count;
 long iter;
 
-pthread_mutex_t mutex_consumer;
-pthread_mutex_t mutex_producer;
+sem_t semaphore;
 
 void *produce(void *arg) {
-	while (iter < MAX_ITER) {
-		pthread_mutex_lock(&mutex_producer);
+	while (count == BUF_SIZE) ;
 
-		if (count < BUF_SIZE) {
-			printf("\n%ld", count);
-			count++;
-		}
+	sem_wait(&semaphore);
 
-		pthread_mutex_unlock(&mutex_producer);
-	}
+	iter++;
+	count++;
+	printf("\n%ld\t%ld", count, iter);
 
-	printf("\nEND of thread %lu!\n", (unsigned long)pthread_self());
-	
+	sem_post(&semaphore); 
+
 	return (NULL);
 }
 
 void *consume(void *arg) {
-	while (iter < MAX_ITER) {
-		pthread_mutex_lock(&mutex_consumer);
+	while (count == 0) ;
 
-		if (count < BUF_SIZE) {
-			printf("\n%ld", count);
-			count--;
-		}
+	sem_wait(&semaphore);
 
-		pthread_mutex_unlock(&mutex_consumer);
-	}
+	iter++;
+	count--;
+	printf("\n%ld\t%ld", count, iter);
 
-	printf("\nEND of thread %lu!\n", (unsigned long)pthread_self());
-	
+	sem_post(&semaphore); 
+
 	return (NULL);
 }
 
 int main(int argc, char *argv[]) {
-    pthread_mutex_init(&mutex_producer, NULL);
-	pthread_mutex_init(&mutex_consumer, NULL);
+    sem_init(&semaphore, 0, 1);
 
 	pthread_t *ptid;
 	int nthreads;
 	int i;
-
-	int thtype = 0; // producer - 0 / consumer - 1
 
 	setbuf(stdout, NULL);
 	if (argc < 2) {
@@ -69,27 +60,22 @@ int main(int argc, char *argv[]) {
 
 	for (i = 0; i < nthreads; i++) {
 
-		if (thtype == 0) { // create producer thread
+		if (i % 2 == 0) { // producer thread
 			if (pthread_create(&ptid[i], NULL, produce, NULL) != 0) {
 				perror("pthread_create");
 				exit(3);
 			}
-		} else { // create consumer thread
+		} else { // consumer thread
 			if (pthread_create(&ptid[i], NULL, consume, NULL) != 0) {
 				perror("pthread_create");
 				exit(3);
 			}
 		}
-
-		thtype = (thtype + 1) % 2; // alternating between types
 	}
 
 	for (i = 0; i < nthreads; i++) pthread_join(ptid[i], NULL);
 
-	printf("\nEND!\n");
-
-	pthread_mutex_destroy(&mutex_producer);
-	pthread_mutex_destroy(&mutex_consumer);
+	sem_destroy(&semaphore);
 	return 0;
 }
 
