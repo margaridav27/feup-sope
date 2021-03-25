@@ -2,7 +2,7 @@
 
 Exercises solved during practical classes for the Operating Systems curricular unit.
 
-### `*** 1st Project - XMOD ***`
+### `1st Project - XMOD` ###
 
 Done in collaboration with:
   -
