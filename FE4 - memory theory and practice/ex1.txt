@@ -1,0 +1,43 @@
+FIRST FIT 
+
+memory  10      4       20      18      7       9       12      15
+request                 12
+
+memory  10      4       8      18      7       9       12      15
+request 10                
+
+memory  4       8      18      7       9       12      15
+request                9
+
+memory  4       8      9      7       9       12      15
+
+-------------------------------------------------------------------
+
+BEST FIT
+
+memory  10      4       20      18      7       9       12      15
+request                                                 12
+
+memory  10      4       20      18      7       9       15
+request 10   
+
+memory  4       20      18      7       9       15
+request                                 9
+
+memory  4       20      18      7       15
+
+-------------------------------------------------------------------
+
+WORST FIT
+
+memory  10      4       20      18      7       9       12      15
+request                 12                                
+
+memory  10      4       8      18      7       9       12      15
+request                        10    
+
+memory  10      4       8      8      7       9       12      15
+request                                                       9
+
+memory  10      4       8      8      7       9       12      6
+
