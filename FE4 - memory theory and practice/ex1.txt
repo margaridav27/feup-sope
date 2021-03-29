@@ -2,6 +2,13 @@ FIRST FIT
 In the first fit approach is to allocate the first free partition or hole large enough which
 can accommodate the process. It finishes after finding the first suitable free partition.
 
+advantages:
+- fastest algorithm because it searches as little as possible
+
+disadvantages:
+- the remaining unused memory areas left after allocation become waste if it is too smaller,
+thus request for larger memory requirement cannot be accomplished
+
 memory  10      4       20      18      7       9       12      15
 request                 12
 
@@ -13,13 +20,6 @@ request                9
 
 memory  4       8      9      7       9       12      15
 
-advantages:
-- fastest algorithm because it searches as little as possible
-
-disadvantages:
-- the remaining unused memory areas left after allocation become waste if it is too smaller,
-thus request for larger memory requirement cannot be accomplished
-
 -------------------------------------------------------------------
 
 BEST FIT
@@ -27,6 +27,13 @@ The best fit deals with allocating the smallest free partition which meets the r
 of the requesting process. This algorithm first searches the entire list of free partitions
 and considers the smallest hole that is adequate. It then tries to find a hole which is close
 to actual process size needed.
+
+advantages:
+- memory utilization is much better than first fit as it searches the smallest free partition 
+first available
+
+disadvantages:
+- it is slower and may even tend to fill up memory with tiny useless holes
 
 memory  10      4       20      18      7       9       12      15
 request                                                 12
@@ -39,18 +46,18 @@ request                                 9
 
 memory  4       20      18      7       15
 
-advantages:
-- memory utilization is much better than first fit as it searches the smallest free partition 
-first available
-
-disadvantages:
-- it is slower and may even tend to fill up memory with tiny useless holes
-
 -------------------------------------------------------------------
 
 WORST FIT
 In worst fit approach is to locate largest available free portion so that the portion left
 will be big enough to be useful. It is the reverse of best fit.
+
+advantages:
+- reduces the rate of production of small gaps
+
+disadvantages:
+- if a process requiring larger memory arrives at a later stage then it cannot be accommodated 
+as the largest hole is already split and occupied
 
 memory  10      4       20      18      7       9       12      15
 request                 12                                
@@ -62,10 +69,3 @@ memory  10      4       8      8      7       9       12      15
 request                                                       9
 
 memory  10      4       8      8      7       9       12      6
-
-advantages:
-- reduces the rate of production of small gaps
-
-disadvantages:
-- if a process requiring larger memory arrives at a later stage then it cannot be accommodated 
-as the largest hole is already split and occupied
