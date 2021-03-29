@@ -5,7 +5,7 @@
 #include <unistd.h>
 
 #define BUF_SIZE 20
-#define MAX_ITER 100
+#define MAX_ITER 10000
 long count;
 long iter;
 
@@ -13,37 +13,36 @@ sem_t empty;
 sem_t full;
 pthread_mutex_t mutex;
 
-void *produce(void *arg) {
-	while (iter < MAX_ITER && count < BUF_SIZE) {
-		sem_wait(&empty);
-		pthread_mutex_lock(&mutex);
+void *producer(void *arg) {
+	if (iter >= MAX_ITER || count == BUF_SIZE) return (NULL);
 
-		iter++;
-		count++;
+	sem_wait(&empty);
+	pthread_mutex_lock(&mutex);
 
-		printf("\n%ld\t%ld", count, iter);
+	iter++;
+	count++;
 
-		pthread_mutex_unlock(&mutex);
-		sem_post(&full);
+	printf("\n%ld\t%ld", count, iter);
 
-	}
+	pthread_mutex_unlock(&mutex);
+	sem_post(&full);
 
 	return (NULL);
 }
 
-void *consume(void *arg) {
-	while (iter < MAX_ITER && count < BUF_SIZE) {
-		sem_wait(&full);
-		pthread_mutex_lock(&mutex);
+void *consumer(void *arg) {
+	if (iter >= MAX_ITER || count == BUF_SIZE) return (NULL);
 
-		iter++;
-		count--;
+	sem_wait(&full);
+	pthread_mutex_lock(&mutex);
 
-		printf("\n%ld\t%ld", count, iter);
+	iter++;
+	count--;
 
-		pthread_mutex_unlock(&mutex);
-		sem_post(&empty);
-	}
+	printf("\n%ld\t%ld", count, iter);
+
+	pthread_mutex_unlock(&mutex);
+	sem_post(&empty);
 
 	return (NULL);
 }
@@ -73,12 +72,12 @@ int main(int argc, char *argv[]) {
 	for (i = 0; i < nthreads; i++) {
 
 		if (i % 2 == 0) { // producer thread
-			if (pthread_create(&ptid[i], NULL, produce, NULL) != 0) {
+			if (pthread_create(&ptid[i], NULL, producer, NULL) != 0) {
 				perror("pthread_create");
 				exit(3);
 			}
 		} else { // consumer thread
-			if (pthread_create(&ptid[i], NULL, consume, NULL) != 0) {
+			if (pthread_create(&ptid[i], NULL, consumer, NULL) != 0) {
 				perror("pthread_create");
 				exit(3);
 			}
@@ -92,5 +91,3 @@ int main(int argc, char *argv[]) {
 	sem_destroy(&full);
 	return 0;
 }
-
-
