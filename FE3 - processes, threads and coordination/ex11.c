@@ -6,45 +6,60 @@
 
 #define BUF_SIZE 20
 #define MAX_ITER 10000
-long count;
-long iter;
 
-sem_t empty;
-sem_t full;
-pthread_mutex_t mutex;
+volatile long count = 0; // buffer index simulator
+volatile long iter = 0; // iteration counter
+
+sem_t empty; // how many slots are free
+sem_t full; // how many slots have content
+pthread_mutex_t mutex; // make buffer addition/removal atomic
 
 void *producer(void *arg) {
-	if (iter >= MAX_ITER || count == BUF_SIZE) return (NULL);
+	while (1) {
+		sem_wait(&empty); // decrease the number of empty slots
+		pthread_mutex_lock(&mutex);
 
-	sem_wait(&empty);
-	pthread_mutex_lock(&mutex);
+		if (iter < MAX_ITER) {
+			iter++;
+			count++;
 
-	iter++;
-	count++;
+			printf("Producer %ld. Count = %ld. Iteration no. %ld\n", pthread_self(), count, iter);
 
-	printf("\n%ld\t%ld", count, iter);
+			pthread_mutex_unlock(&mutex); 
+			sem_post(&full); // increase the number of slots with content
+		} 
+		else { // no iterations left, stop the execution
+			pthread_mutex_unlock(&mutex);
+			sem_post(&full);
+			break;
+		}
+	}
 
-	pthread_mutex_unlock(&mutex);
-	sem_post(&full);
-
-	return (NULL);
+	return NULL;
 }
 
 void *consumer(void *arg) {
-	if (iter >= MAX_ITER || count == BUF_SIZE) return (NULL);
+	while (1) {
+		sem_wait(&full); // decrease the number of slots with content
+		pthread_mutex_lock(&mutex);
 
-	sem_wait(&full);
-	pthread_mutex_lock(&mutex);
+		if (iter < MAX_ITER) {
+			iter++;
+			count--;
 
-	iter++;
-	count--;
+			printf("Consumer %ld. Count = %ld. Iteration no. %ld\n", pthread_self(), count, iter);
 
-	printf("\n%ld\t%ld", count, iter);
+			pthread_mutex_unlock(&mutex);
+			sem_post(&empty); // increase the number of empty slots
+		} 
+		else { // no iterations left, stop the execution
+			pthread_mutex_unlock(&mutex);
+			sem_post(&empty); 
+			break;
+		}
+	}
 
-	pthread_mutex_unlock(&mutex);
-	sem_post(&empty);
-
-	return (NULL);
+	return NULL;
 }
 
 int main(int argc, char *argv[]) {
