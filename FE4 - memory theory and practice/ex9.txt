@@ -1,0 +1,32 @@
+This is actually a very interesting question.
+
+So, one could break into the privileged section without knowing the password in two ways.
+
+First of all, notice the usage of strcmp instead of strncmp. The problem with strcmp is
+that sometimes, if by mistake, arguments that are passed are not valid c-strings, i.e.
+are not terminated with a null character, '\0', strcmp continues comparing until it reaches
+non-accessible memory, what can lead to unexpected behaviour or even the program crashing.
+
+Second and most important aspect to notice is the usage of gets when scanning the stdin
+stream content and here is where things get interesting. 
+
+When typing "man gets", on the DESCRIPTION sections is said, explicitly, "Never use this
+function.", but why? Well, the answer is actually a few lines below, on the BUGS section
+- "Never use gets(). Because it is impossible to tell without knowing the data in advance
+how many characters gets() will read, and because gets() will continue to store characters
+past the end of the buffer, it is extremely dangerous to use. It has been used to break
+computer security." 
+
+However, this information taken into consideration alone just informs us that unexpected
+behaviour may occur, which could already in the first case. The really interesting detail
+is the order in which the variables buff and pass are declared. The memory layout of a C 
+program indicates us in which direction the stack grows, i.e. downwards, so we know that
+somewhere below buff, in the stack, will be the memory slots assign to the pass variable.
+
+This means that by "gets() will continue to store characters past the end of the buffer",
+gets() might store some of those values in the memory slots assign to the pass variable.
+Because those memory slots are meant to have an integer value, the value that would be
+stored in buff as a char, will be converted to an integer correspondent to the ascii value
+of that char and so, the if (pass) condition will always verify, unless it stores the null
+character, which is the only one whose ascii value is 0.
+
