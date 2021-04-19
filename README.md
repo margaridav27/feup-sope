@@ -2,6 +2,8 @@
 
 Exercises solved during practical classes for the Operating Systems curricular unit.
 
+The two projects developed during the semester are linked below.
+
 #### [`1st Project - XMOD`](https://github.com/margaridav27/feup-sope-xmod) ####
 
 #### [`2nd Project - Application Server`](https://github.com/margaridav27/feup-sope-ApplicationServer) ####
